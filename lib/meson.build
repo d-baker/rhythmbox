@@ -1,0 +1,58 @@
+subdir('libmediaplayerid')
+
+lib_headers = [
+  'rb-builder-helpers.h',
+  'rb-debug.h',
+  'rb-file-helpers.h',
+  'rb-list-model.h',
+  'rb-stock-icons.h',
+  'rb-string-value-map.h',
+  'rb-util.h',
+  'rb-task-progress.h',
+  'rb-task-progress-simple.h'
+]
+
+install_headers(lib_headers, subdir: 'rhythmbox/lib')
+
+lib_sources = [
+  'rb-debug.c',
+  'rb-file-helpers.c',
+  'rb-builder-helpers.c',
+  'rb-stock-icons.c',
+  'rb-cut-and-paste-code.c',
+  'rb-cut-and-paste-code.h',
+  'rb-util.c',
+  'rb-tree-dnd.c',
+  'rb-tree-dnd.h',
+  'rb-string-value-map.c',
+  'rb-async-queue-watch.c',
+  'rb-async-queue-watch.h',
+  'rb-text-helpers.c',
+  'rb-text-helpers.h',
+  'rb-gst-media-types.c',
+  'rb-gst-media-types.h',
+  'rb-missing-plugins.c',
+  'rb-missing-plugins.h',
+  'rb-async-copy.c',
+  'rb-async-copy.h',
+  'rb-chunk-loader.c',
+  'rb-chunk-loader.h',
+  'rb-task-progress.c',
+  'rb-task-progress-simple.c',
+  'rb-list-model.c'
+]
+
+lib_c_args = [
+  '-DGNOMELOCALEDIR="' + get_option('datadir') + '/locale"',
+  '-DSHARE_DIR="' + get_option('datadir') + '"',
+  '-DDATADIR="' + get_option('datadir') + '"'
+]
+
+librb = library('rb', lib_sources,
+  c_args: lib_c_args + ['-DG_LOG_DOMAIN="Rhythmbox"'],
+  include_directories: [configinc],
+  dependencies: [gio, gio_unix, glib, gobject, gstreamer,
+                 gstreamer_pbutils, gtk, libpeas, libpeas_gtk, libxml],
+  install: 'true',
+  link_args: ['-export-dynamic']
+)

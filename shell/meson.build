@@ -1,0 +1,118 @@
+gnome = import('gnome')
+
+custom_target('AUTHORS.tab',
+  input: '../AUTHORS',
+  output: 'AUTHORS.tab',
+  command: ['sed', '-e', 's/^/"/', '-e', 's/$/",/', '@INPUT@'],
+  capture: true
+)
+
+shell_headers = [
+  'rb-shell.h',
+  'rb-shell-player.h',
+  'rb-shell-preferences.h',
+  'rb-playlist-manager.h',
+  'rb-removable-media-manager.h',
+  'rb-history.h',
+  'rb-play-order.h',
+  'rb-track-transfer-batch.h',
+  'rb-track-transfer-queue.h'
+]
+
+install_headers(shell_headers, subdir: 'rhythmbox/shell')
+
+resources = gnome.compile_resources('rb-resources', 'rhythmbox.gresource.xml',
+  source_dir: '../data/')
+
+shell_sources = [
+  'rb-application.c',
+  'rb-application.h',
+  'rb-history.c',
+  'rb-play-order.c',
+  'rb-play-order-linear.c',
+  'rb-play-order-linear.h',
+  'rb-play-order-linear-loop.c',
+  'rb-play-order-linear-loop.h',
+  'rb-play-order-queue.c',
+  'rb-play-order-queue.h',
+  'rb-play-order-random.c',
+  'rb-play-order-random.h',
+  'rb-play-order-random-by-age.c',
+  'rb-play-order-random-by-age.h',
+  'rb-play-order-random-by-age-and-rating.c',
+  'rb-play-order-random-by-age-and-rating.h',
+  'rb-play-order-random-by-rating.c',
+  'rb-play-order-random-by-rating.h',
+  'rb-play-order-random-equal-weights.c',
+  'rb-play-order-random-equal-weights.h',
+  'rb-play-order-shuffle.c',
+  'rb-play-order-shuffle.h',
+  'rb-playlist-manager.c',
+  'rb-removable-media-manager.c',
+  'rb-shell.c',
+  'rb-shell-clipboard.c',
+  'rb-shell-clipboard.h',
+  'rb-shell-player.c',
+  'rb-shell-preferences.c',
+  'rb-shell-preferences.h',
+  'rb-statusbar.c',
+  'rb-statusbar.h',
+  'rb-task-list.c',
+  'rb-task-list.h',
+  'rb-track-transfer-batch.c',
+  'rb-track-transfer-queue.c',
+  resources
+]
+
+shell_c_args = [
+  '-DGNOMELOCALEDIR="' + get_option('datadir') + '/locale"',
+  '-DG_LOG_DOMAIN="Rhythmbox"',
+  '-DPIXMAP_DIR="' + get_option('datadir') + '/pixmaps"',
+  '-DSHARE_DIR="' + get_option('datadir') + '"',
+  '-DDATADIR="' + get_option('datadir') + '"',
+  '-DLIBDIR="' + get_option('libdir') + '"',
+  '-D__EXTENSIONS__',
+]
+
+librhythmbox_core = shared_library('rhythmbox_core', shell_sources,
+  c_args: shell_c_args,
+  include_directories: [
+    configinc, backendsinc, libinc, libmediaplayeridinc, metadatainc,
+    podcastinc, pluginsinc, rhythmdbinc, shellinc, sourcesinc, widgetsinc
+  ],
+  dependencies: [
+    glib, gstreamer, gstreamer_audio, gstreamer_controller, gstreamer_tag, gstreamer_pbutils, gudev, libmtp,
+    libpeas, libpeas_gtk, libxml, totem_plparser,
+  ],
+  install: 'true',
+  link_args: ['-export-dynamic', '-Wno-undef'],
+  link_with: [
+    libmpid, librb, libsources, librbbackends, librbbackendsgstreamer, librbbackends, librbpodcast, librhythmdb, librbwidgets,
+    libsourcesync
+  ],
+  version: '@0@.@1@.@2@'.format(RHYTHMBOX_CORE_CURRENT, RHYTHMBOX_CORE_REVISION, RHYTHMBOX_CORE_AGE)
+)
+
+# note: gio-unix-2.0 is here for libmediaplayerid
+deps_rhythmbox = [gobject_introspection, gstreamer, gstreamer_audio,
+                  gstreamer_base, gstreamer_pbutils, gstreamer_plugins_base,
+                  gtk, gdk_pixbuf, glib, gio, gio_unix, libsoup, libpeas,
+                  libpeas_gtk, libxml, tdb, json_glib]
+
+if gdk_targets.contains('x11')
+  deps_rhythmbox = deps_rhythmbox + [x11]
+endif
+
+if enable_python
+  deps_rhythmbox += [pygobject]
+endif
+
+executable('rhythmbox', 'main.c',
+  dependencies: deps_rhythmbox,
+  include_directories: [
+    configinc, backendsinc, libinc, libmediaplayeridinc, metadatainc,
+    podcastinc, pluginsinc, rhythmdbinc, shellinc, sourcesinc
+  ],
+  link_args: ['-export-dynamic', '-Wno-undef'],
+  link_with: librhythmbox_core
+)
