@@ -7,10 +7,12 @@ foreach desktop_in_file : desktop_in_files
   )
 endforeach
 
-# This is done with intltool in the Makefile.am, but there's no need to
-# use intltool any more.
+# It would be nice to avoid requiring intltool, and just use Gettext's msgfmt
+# tool. The blocker is we need to write an appropriate .its file to describe
+# how to translate Rhythmbox's XML playlist format, because msgfmt doesn't
+# support the Intltool 'generic XML style' that we currently use.
 playlists_xml = custom_target('playlists.xml',
   input: 'playlists.xml.in',
   output: 'playlists.xml',
-  command: ['msgfmt', '--xml', '-d', '../po', '--template', '@INPUT@', '-o', '@OUTPUT@'],
+  command: [intltool_merge, '--xml-style', '--utf8', '../po', '@INPUT@', '@OUTPUT@'],
 )

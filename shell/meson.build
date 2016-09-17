@@ -37,7 +37,8 @@ shell_headers = [
 install_headers(shell_headers, subdir: 'rhythmbox/shell')
 
 resources = gnome.compile_resources('rb-resources', 'rhythmbox.gresource.xml',
-  source_dir: ['data/', 'data/ui/foo'])
+  source_dir: ['../data/'],
+  dependencies: playlists_xml)
 
 shell_sources = [
   'rb-application.c',
