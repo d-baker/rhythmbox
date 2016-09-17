@@ -58,33 +58,36 @@ widget_sources = [
   'rb-encoding-settings.c'
 ]
 
-rb_c_args = [
+widget_c_args = [
   '-DGNOMELOCALEDIR="' + get_option('datadir') + '/locale"',
   '-DG_LOG_DOMAIN="Rhythmbox"',
 ]
 
+widget_dependencies = [ lib_dep, rhythmdb_dep, podcast_dep, libnotify ]
 
 librbwidgets = static_library('rbwidgets', widget_sources,
-  c_args: rb_c_args,
+  c_args: widget_c_args,
   include_directories: [
-    configinc, backendsinc, libinc, metadatainc, rhythmdbinc, shellinc,
-    sourcesinc
+    backendsinc, shellinc, sourcesinc
   ],
-  dependencies: [
-    gstreamer, gstreamer_pbutils, gtk, libnotify, libsoup, libxml
-  ],
+  dependencies: widget_dependencies,
   install: 'true',
   link_args: ['-export-dynamic'],
-  link_with: [librb, librhythmdb]
 )
+
+widgets_dep = declare_dependency(
+  # We list librhythmdb in both 'link_with' and 'dependencies' due to
+  # circular dependency between rhythmdb/ and widgets/.
+  link_with: [librhythmdb, librbwidgets],
+  dependencies: widget_dependencies,
+  include_directories: widgetsinc
+)
+
 
 # These are interactive UI tests.
 
 test_rb_segmented_bar = executable('test-rb-segmented-bar', 'test-rb-segmented-bar.c',
-  dependencies: [gtk],
-  link_with: librbwidgets)
+  dependencies: [widgets_dep])
 
 test_uri_dialog = executable('test-uri-dialog', 'test-uri-dialog.c',
-  dependencies: [gtk],
-  include_directories: [libinc],
-  link_with: [librb, librbwidgets])
+  dependencies: [widgets_dep])

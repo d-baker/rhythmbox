@@ -1,10 +1,25 @@
 gnome = import('gnome')
 
+make_tab_command = ['sed', '-e', 's/^/"/', '-e', 's/$/",/', '@INPUT@']
+
 custom_target('AUTHORS.tab',
-  input: '../AUTHORS',
-  output: 'AUTHORS.tab',
-  command: ['sed', '-e', 's/^/"/', '-e', 's/$/",/', '@INPUT@'],
-  capture: true
+  input: '../AUTHORS', output: 'AUTHORS.tab',
+  command: make_tab_command, capture: true
+)
+
+custom_target('MAINTAINERS.tab',
+  input: '../MAINTAINERS', output: 'MAINTAINERS.tab',
+  command: make_tab_command, capture: true
+)
+
+custom_target('MAINTAINERS.old.tab',
+  input: '../MAINTAINERS.old', output: 'MAINTAINERS.old.tab',
+  command: make_tab_command, capture: true
+)
+
+custom_target('DOCUMENTERS.tab',
+  input: '../DOCUMENTERS', output: 'DOCUMENTERS.tab',
+  command: make_tab_command, capture: true
 )
 
 shell_headers = [
@@ -22,7 +37,7 @@ shell_headers = [
 install_headers(shell_headers, subdir: 'rhythmbox/shell')
 
 resources = gnome.compile_resources('rb-resources', 'rhythmbox.gresource.xml',
-  source_dir: '../data/')
+  source_dir: ['data/', 'data/ui/foo'])
 
 shell_sources = [
   'rb-application.c',

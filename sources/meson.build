@@ -61,14 +61,16 @@ if use_no_strict_aliasing
   source_c_args += ['-fno-strict-aliasing']
 endif
 
+sources_dependencies = [backends_dep, source_sync_dep, totem_plparser]
+
 libsources = static_library('sources', source_sources,
   c_args: source_c_args,
-  include_directories: [
-    configinc, backendsinc, libinc, libmediaplayeridinc, metadatainc,
-    podcastinc, rhythmdbinc, shellinc, sourcesinc, sourcessyncinc, widgetsinc,
-  ],
-  dependencies: [
-    glib, gio, gobject, gstreamer, gtk, libxml, totem_plparser ],
+  include_directories: [ shellinc, widgetsinc, ],
+  dependencies: sources_dependencies,
   install: 'true',
   link_args: ['-export-dynamic'],
+)
+
+sources_dep = declare_dependency(
+  link_with: libsources
 )

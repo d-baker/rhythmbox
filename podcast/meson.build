@@ -35,41 +35,45 @@ podcast_sources = [
   'rb-podcast-entry-types.c'
 ]
 
-c_args = [
+podcast_c_args = [
   '-DGNOMELOCALEDIR="' + get_option('datadir') + '/locale"',
   '-DG_LOG_DOMAIN="RhythmBox"'
 ]
 
+podcast_dependencies = [
+    rhythmdb_dep, json_glib, libsoup, totem_plparser
+]
+
 librbpodcast = static_library('rbpodcast', podcast_sources,
-  c_args: c_args,
+  c_args: podcast_c_args,
+  dependencies: podcast_dependencies,
   include_directories: [
-    configinc, libinc, metadatainc, podcastinc, rhythmdbinc, shellinc,
-    sourcesinc, widgetsinc
-  ],
-  dependencies: [
-    glib, gobject, gstreamer, gtk, json_glib, libsoup, libxml, totem_plparser
-  ],
-  link_with: librhythmdb)
+     shellinc, sourcesinc, widgetsinc
+  ]
+)
+
+podcast_dep = declare_dependency(
+  link_with: librbpodcast,
+  dependencies: podcast_dependencies,
+  include_directories: include_directories('.'),
+)
 
 librbpodcast_parse = static_library('rbpodcast_parse', podcast_parse_sources,
   c_args: c_args,
-  include_directories: [configinc, libinc],
-  dependencies: [glib, json_glib, libsoup, totem_plparser],
-  link_with: librb)
+  dependencies: [lib_dep, json_glib, libsoup, totem_plparser])
 
 test_podcast_search = executable('test-podcast-search',
   'test-podcast-search.c',
   c_args: c_args,
   include_directories: [configinc, libinc],
-  dependencies: [glib, json_glib, totem_plparser],
-  link_with: [librbpodcast_parse, librb])
+  dependencies: [lib_dep, json_glib, totem_plparser],
+  link_with: [librbpodcast_parse])
 
 test_podcast_parse = executable('test-podcast-parse',
   'test-podcast-parse.c',
   c_args: c_args,
-  include_directories: [configinc, libinc],
-  dependencies: [glib, totem_plparser],
-  link_with: [librb, librbpodcast_parse])
+  dependencies: [lib_dep, totem_plparser],
+  link_with: [librbpodcast_parse])
 
 #
 #PLUGIN_FILES = rhythmbox-itms-plugin.c npapi.h npupp.h npruntime.h

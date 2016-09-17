@@ -14,13 +14,19 @@ gstreamer_backend_c_args = [
   '-DG_LOG_DOMAIN="Rhythmbox"',
 ]
 
+gstreamer_backend_dependencies = [rhythmdb_dep, gdk_pixbuf]
+
 librbbackendsgstreamer = static_library('rbbackendsgstreamer',
   gstreamer_backend_sources,
   c_args: gstreamer_backend_c_args,
-  dependencies: [gdk_pixbuf, gstreamer, gtk, libxml],
-  include_directories: [
-    configinc, libinc, metadatainc, backendsinc, rhythmdbinc,
-  ],
+  dependencies: gstreamer_backend_dependencies,
+  include_directories: backendsinc,
   install: 'true',
   link_args: ['-export-dynamic'],
+)
+
+gstreamer_backend_dep = declare_dependency(
+  link_with: librbbackendsgstreamer,
+  dependencies: gstreamer_backend_dependencies,
+  include_directories: [ include_directories('.') ]
 )

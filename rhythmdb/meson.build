@@ -46,11 +46,13 @@ if use_no_strict_aliasing
 endif
 
 librhythmdb = static_library('rhythmdb', sources,
-  # GStreamer and Gtk are included in some lib/ headers, so we have to depend
-  # on them here to use librb. In case you wonder why a database library
-  # requires a GUI or audio playback...
   c_args: c_args,
-  dependencies: [gio, glib, gobject, gstreamer, gtk, libmath, libxml, tdb],
-  include_directories: [configinc, libinc, metadatainc, podcastinc, widgetsinc],
-  link_args: '-export-dynamic',
-  link_with: [librb, librbmetadata])
+  dependencies: [metadata_dep, libmath],
+  include_directories: [podcastinc, widgetsinc],
+  link_args: '-export-dynamic')
+
+rhythmdb_dep = declare_dependency(
+  link_with: librhythmdb,
+  include_directories: include_directories('.'),
+  dependencies: [metadata_dep],
+)

@@ -48,11 +48,21 @@ lib_c_args = [
   '-DDATADIR="' + get_option('datadir') + '"'
 ]
 
+lib_dependencies = [
+   gio, gio_unix, glib, gobject, gstreamer, gstreamer_pbutils, gtk, libpeas,
+   libpeas_gtk, libxml
+]
+
 librb = library('rb', lib_sources,
   c_args: lib_c_args + ['-DG_LOG_DOMAIN="Rhythmbox"'],
   include_directories: [configinc],
-  dependencies: [gio, gio_unix, glib, gobject, gstreamer,
-                 gstreamer_pbutils, gtk, libpeas, libpeas_gtk, libxml],
-  install: 'true',
+  dependencies: lib_dependencies,
+  install: true,
   link_args: ['-export-dynamic']
+)
+
+lib_dep = declare_dependency(
+  link_with: librb,
+  dependencies: lib_dependencies,
+  include_directories: [configinc, libinc],
 )

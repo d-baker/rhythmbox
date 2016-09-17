@@ -23,11 +23,13 @@ endif
 
 libsourcesync = static_library('sourcesync', sourcesync_sources,
   c_args: sourcesync_c_args,
-  include_directories: [
-    configinc, backendsinc, libinc, libmediaplayeridinc, metadatainc,
-    podcastinc, rhythmdbinc, shellinc, sourcesinc, widgetsinc,
-  ],
-  dependencies: [ gio, glib, gobject, gstreamer_pbutils, gtk, libxml ],
+  dependencies: [podcast_dep],
+  include_directories: [shellinc, sourcesinc, widgetsinc],
   install: 'true',
   link_args: ['-export-dynamic'],
+)
+
+source_sync_dep = declare_dependency(
+  link_with: libsourcesync,
+  include_directories: include_directories('.')
 )

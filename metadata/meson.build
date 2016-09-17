@@ -49,17 +49,19 @@ endif
 # client library
 
 librbmetadata = static_library('rbmetadata', metadata_sources,
-  dependencies: [glib, gtk, tdb],
-  include_directories: [configinc, libinc],
-  link_args: '-export-dynamic',
-  link_with: [librb])
+  dependencies: [lib_dep, tdb],
+  link_args: '-export-dynamic')
+
+metadata_dep = declare_dependency(
+  link_with: librbmetadata,
+  dependencies: [lib_dep],
+  include_directories: metadatainc
+)
 
 # service
 
 librbmetadatasvc = static_library('rbmetadatasvc', metadata_service_sources,
-  dependencies: [glib, gobject, gstreamer, gstreamer_pbutils, gtk],
-  include_directories: [configinc, libinc],
-  link_with: [librb])
+  dependencies: [lib_dep, glib, gobject, gstreamer, gstreamer_pbutils, gtk])
 
 executable('rhythmbox-metadata', metadata_dbus_service_sources,
   link_with: librbmetadatasvc,

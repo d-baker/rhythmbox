@@ -438,12 +438,17 @@ sourcessyncinc = include_directories('sources/sync')
 widgetsinc = include_directories('widgets')
 
 subdir('data')
+
 subdir('lib')
-subdir('backends')
 subdir('metadata')
 subdir('rhythmdb')
+subdir('backends')
 subdir('plugins')
 subdir('podcast')
 subdir('sources')
 subdir('widgets')
 subdir('shell')
+
+subdir('tests')
+
+subdir('po')
